@@ -10,9 +10,6 @@ export class DeviceDto {
     @IsString()
     deviceModel: string;
 
-    @IsBoolean()
-    isActive: boolean;
-
     @IsString()
     code: string;
 }
