@@ -9,10 +9,8 @@ import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
 import { Roles } from './auth/dto/roles.enum';
 import { WsModule } from './ws/ws.module';
-import { DeviceService } from './device/device.service';
-import { DeviceController } from './device/device.controller';
 import { DeviceModule } from './device/device.module';
-import { WsGetaway } from './ws/ws/ws.gateway';
+import { WsGetaway } from './ws/ws-gateway/ws.gateway';
 
 @Module({
   imports: [

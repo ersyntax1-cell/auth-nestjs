@@ -1,16 +1,26 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    forwardRef,
+    Inject,
+    Injectable,
+    NotFoundException
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Device, DeviceDocument } from './schema/device.schema';
 import { Model } from 'mongoose';
 import { generateRandomCode } from 'src/utils/random.utils';
 import { AuthService } from 'src/auth/auth.service';
 import { DeviceDto } from './dto/device.dto';
+import { WsGetaway } from 'src/ws/ws-gateway/ws.gateway';
 
 @Injectable()
 export class DeviceService {
     constructor(
         @InjectModel(Device.name) private readonly deviceModel: Model<DeviceDocument>,
         private readonly authService: AuthService,
+
+        @Inject(forwardRef(() => WsGetaway))
+        private readonly wsGateway: WsGetaway,
     ) { }
 
     async createDevice(
@@ -42,8 +52,10 @@ export class DeviceService {
             return { status: 'inactive', code: device.code };
         }
 
-        const token = await this.authService.deviceLogin();
-        return { status: 'active', token: token.access_token };
+        const deviceLogin = await this.authService.deviceLogin();
+        const access_token = deviceLogin.access_token;
+        
+        return { status: 'active', token: access_token };
     }
 
     async approveDeviceByCode(code: string) {
@@ -60,8 +72,21 @@ export class DeviceService {
         device.isActive = true;
         await device.save();
 
-        const token = await this.authService.deviceLogin();
-        return { token: token.access_token };
+        const socket = this.wsGateway.getSocketByDeviceId(device.deviceId);
+
+        if (socket) {
+            socket.emit('checkDevice', {
+                message: 'Your device is now active!',
+                isActive: true,
+            });
+        }
+
+        const deviceLogin = await this.authService.deviceLogin();
+        const access_token = deviceLogin.access_token;
+
+        return {
+            token: access_token
+        };
     }
 
 }

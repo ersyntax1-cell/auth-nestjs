@@ -4,6 +4,7 @@ import { DeviceController } from './device.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Device, DeviceSchema } from './schema/device.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { WsModule } from 'src/ws/ws.module';
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import { AuthModule } from 'src/auth/auth.module';
             schema: DeviceSchema
         }]),
         forwardRef(() => AuthModule),
+        forwardRef(() => WsModule),
     ],
     providers: [DeviceService],
     controllers: [DeviceController],
