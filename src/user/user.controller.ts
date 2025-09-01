@@ -13,12 +13,16 @@ import { RoleGuard } from 'src/auth/guards/roles.guard';
 import { RoleDecorator } from 'src/auth/decorators/roles.decorator';
 import { Roles } from 'src/auth/dto/roles.enum';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { DeviceService } from 'src/device/device.service';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'), RoleGuard)
 @RoleDecorator(Roles.Admin)
 export class UserController {
-    constructor(private readonly userService: UserService) { }
+    constructor(
+        private readonly userService: UserService,
+        private readonly deviceService: DeviceService
+    ) { }
 
     @Post('create-basic')
     async createUser (@Body() body: RegisterDto) {
@@ -42,5 +46,10 @@ export class UserController {
     @Post("delete-user/:id")
     async deleteUser (@Param('id') id: string) {
         return await this.userService.deleteUser(id);
+    }
+
+    @Post('approve-device')
+    async approveDevice (@Body() body: {code: string}) {
+        return this.deviceService.approveDeviceByCode(body.code);
     }
 }
