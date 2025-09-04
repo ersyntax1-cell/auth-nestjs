@@ -43,7 +43,8 @@ export class DeviceService {
         if (!device) {
             const code = generateRandomCode(8);
 
-            await this.createDevice(deviceId, code)
+            const newDevice = await this.createDevice(deviceId, code)
+            await newDevice.save();
 
             return { status: 'new', code };
         }
@@ -54,7 +55,7 @@ export class DeviceService {
 
         const deviceLogin = await this.authService.deviceLogin();
         const access_token = deviceLogin.access_token;
-        
+
         return { status: 'active', token: access_token };
     }
 
@@ -87,6 +88,10 @@ export class DeviceService {
         return {
             token: access_token
         };
+    }
+
+    async getAllDevices () {
+        return await this.deviceModel.find();
     }
 
 }

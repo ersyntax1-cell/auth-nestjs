@@ -28,4 +28,11 @@ export class DeviceController {
     async approveDevice (@Param('code') code: string) {
         return this.deviceService.approveDeviceByCode(code);
     }
+
+    @UseGuards(AuthGuard('jwt'), RoleGuard)
+    @RoleDecorator(Roles.Admin)
+    @Get('get-devices')
+    async getDevices () {
+        return this.deviceService.getAllDevices();
+    }
 }

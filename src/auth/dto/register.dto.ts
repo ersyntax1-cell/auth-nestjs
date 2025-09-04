@@ -1,9 +1,9 @@
 import { 
-    IsArray,
     IsEmail, 
     IsEnum, 
     IsOptional, 
     IsString,
+    Length,
     MinLength
 } from "class-validator";
 import { Roles } from "./roles.enum";
@@ -19,9 +19,14 @@ export class RegisterDto {
     @ApiProperty({ example: "User1996@_Ai", description: "The user's password" })
     password: string;
 
-    @IsArray()
     @IsEnum(Roles, { each: true })
     @ApiProperty({ example: Roles, description: "The user's role" })
     @IsOptional()
-    role?: Roles[]
+    role?: Roles[];
+
+    @IsString()
+    @IsOptional()
+    @Length(6, 6, { message: 'The code length cannot be more than 6.' })
+    @ApiProperty({ example: '333666', description: "The verification code" })
+    code?: string;
 }

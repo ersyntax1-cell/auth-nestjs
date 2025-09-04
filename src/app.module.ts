@@ -11,6 +11,7 @@ import { Roles } from './auth/dto/roles.enum';
 import { WsModule } from './ws/ws.module';
 import { DeviceModule } from './device/device.module';
 import { WsGetaway } from './ws/ws-gateway/ws.gateway';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { WsGetaway } from './ws/ws-gateway/ws.gateway';
     UserModule,
     WsModule,
     DeviceModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService, ConfigService, WsGetaway],
