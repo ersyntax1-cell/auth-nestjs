@@ -1,10 +1,11 @@
 import {
-    BadRequestException,
     Body,
     Controller,
     Get,
     Post,
+    Req,
     Request,
+    Res,
     UnauthorizedException,
     UseGuards
 } from '@nestjs/common';
@@ -18,6 +19,8 @@ import {
     ApiResponse,
     ApiTags
 } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import type { Response } from 'express';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -40,7 +43,7 @@ export class AuthController {
     })
     async register(@Body() body: RegisterDto) {
         const user = await this.usersService.create(body);
-        
+
         return {
             id: user._id,
             email: user.email,
@@ -61,7 +64,7 @@ export class AuthController {
     })
     async login(@Body() body: LoginDto) {
         const user = await this.authService.validateUser(body.email, body.password);
-        
+
         if (!user) {
             throw new UnauthorizedException('The email or password is incorrect.');
         }
@@ -76,5 +79,17 @@ export class AuthController {
     @ApiResponse({ status: 200, description: "User profile received" })
     getProfile(@Request() req: any) {
         return req.user;
+    }
+
+    @Get('google')
+    @UseGuards(AuthGuard('google'))
+    async googleAuth() { }
+
+    @Get('google/redirect')
+    @UseGuards(AuthGuard('google'))
+    async googleAuthRedirect(@Req() req, @Res() res: Response) {
+        const token = await this.authService.loginWithGoogle(req.user);
+
+        res.redirect(`http://localhost:5173/auth/redirect?token=${token}`);
     }
 }

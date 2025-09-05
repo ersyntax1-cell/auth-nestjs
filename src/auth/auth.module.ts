@@ -5,6 +5,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from 'src/user/user.module';
+import { PassportModule } from '@nestjs/passport';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -18,8 +20,9 @@ import { UserModule } from 'src/user/user.module';
       }),
       inject: [ConfigService],
     }),
+    PassportModule.register({ defaultStrategy: 'google' })
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, GoogleStrategy],
   controllers: [AuthController],
   exports: [AuthService]
 })
